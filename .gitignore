@@ -1,0 +1,18 @@
+# Frontend React Native
+animalsafe-mobile/node_modules/
+animalsafe-mobile/.expo/
+
+# Backend Spring Boot
+animalsafe2.0/target/
+animalsafe2.0/.idea/
+animalsafe2.0/*.iml
+
+# Env
+.env
+*.env
+
+# VSCode
+.vscode/
+
+# Logs
+*.log
