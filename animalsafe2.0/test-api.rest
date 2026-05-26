@@ -1,0 +1,169 @@
+### ANIMAL SAFE - REST API TEST
+### Base URL
+@baseUrl = http://localhost:8080
+@contentType = application/json
+
+### ============================================================
+### 1. AUTENTICACIÓN
+### ============================================================
+
+### 1.1 Registrar nuevo usuario
+POST http://localhost:8080/api/auth/register
+Content-Type: {{contentType}}
+
+{
+  "name": "roberto Pérez",
+  "email": "juan@sgsg.com",
+  "password": "Password123!",
+  "passwordConfirm": "Password123!"
+}
+
+### 1.2 Login - Obtener JWT Token
+POST http://localhost:8080/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "juan@sgsg.com",
+  "password": "Password123!"
+}
+
+### Guardar token del login anterior en @token
+@token = Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJqdWFuQHNnc2cuY29tIiwidXNlcklkIjoyLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc3NzAwMTkzMiwiZXhwIjoxNzc3MDg4MzMyfQ.4DgGk_KwbafkXAGe8YMQld850fPoZ2OSB-c4cwechJDIElxAKD4ld8y25LzUG0-2XZGkPU6GJdF-aUeOQV1eLw
+
+### ============================================================
+### 2. USUARIOS - CRUD (GET/DELETE)
+### ============================================================
+
+### 2.1 Obtener todos los usuarios (solo ADMIN)
+GET http://localhost:8080/api/users
+Content-Type: application/json
+Authorization: {{token}}
+### 2.2 Obtener usuario por ID
+GET http://localhost:8080/api/users/2
+Content-Type: application/json
+Authorization: {{token}}
+
+### 2.3 Eliminar usuario por ID
+DELETE {{baseUrl}}/api/users/1
+Content-Type: {{contentType}}
+Authorization: {{token}}
+
+### ============================================================
+### 3. REPORTES - CRUD
+### ============================================================
+
+### 3.1 Crear nuevo reporte
+POST http://localhost:8080/api/reports
+Content-Type: {{contentType}}
+Authorization: {{token}}
+
+{
+  "title": "Perro herido en el parque",
+  "description": "Se encuentra un perro pequeño con una herida en la pata delantera",
+  "latitude": 40.4168,
+  "longitude": -3.7038,
+  "address": "Parque del Retiro, Madrid",
+  "animalType": "dog",
+  "animalCondition": "injured",
+  "animalDescription": "Perro blanco y marrón, aproximadamente 5kg"
+}
+
+### 3.2 Obtener todos los reportes
+GET http://localhost:8080/api/reports
+Content-Type: {{contentType}}
+Authorization: {{token}}
+
+### 3.3 Obtener reporte por ID
+GET {{baseUrl}}/api/reports/1
+Content-Type: {{contentType}}
+Authorization: {{token}}
+
+### 3.4 Obtener reportes por usuario
+GET {{baseUrl}}/api/reports/user/1
+Content-Type: {{contentType}}
+Authorization: {{token}}
+
+### 3.5 Obtener reportes por estado
+GET {{baseUrl}}/api/reports/status/OPEN
+Content-Type: {{contentType}}
+Authorization: {{token}}
+
+### 3.6 Obtener reportes cercanos (geolocalización)
+GET {{baseUrl}}/api/reports/nearby?latitude=40.4168&longitude=-3.7038&radiusKm=5
+Content-Type: {{contentType}}
+Authorization: {{token}}
+
+### 3.7 Actualizar estado del reporte
+PATCH {{baseUrl}}/api/reports/1/status
+Content-Type: {{contentType}}
+Authorization: {{token}}
+
+{
+  "newStatus": "IN_PROGRESS"
+}
+
+### 3.8 Eliminar reporte
+DELETE {{baseUrl}}/api/reports/1
+Content-Type: {{contentType}}
+Authorization: {{token}}
+
+### ============================================================
+### 4. CREAR MÚLTIPLES REPORTES (Para probar geolocalización)
+### ============================================================
+
+### 4.1 Reporte 2 - Gato en calle
+POST http://localhost:8080/api/reports
+Content-Type: {{contentType}}
+Authorization: {{token}}
+
+{
+  "title": "Gato perdido",
+  "description": "Gato gris desaparecido hace 3 días",
+  "latitude": 40.4201,
+  "longitude": -3.7036,
+  "address": "Calle Príncipe, Madrid",
+  "animalType": "cat",
+  "animalCondition": "lost",
+  "animalDescription": "Gato gris con collar rojo"
+}
+
+### 4.2 Reporte 3 - Pájaro herido
+POST http://localhost:8080/api/reports
+Content-Type: {{contentType}}
+Authorization: {{token}}
+
+{
+  "title": "Pájaro herido en el suelo",
+  "description": "Pájaro que no puede volar",
+  "latitude": 40.4130,
+  "longitude": -3.7100,
+  "address": "Plaza Mayor, Madrid",
+  "animalType": "bird",
+  "animalCondition": "injured",
+  "animalDescription": "Pájaro marrón pequeño"
+}
+
+### ============================================================
+### NOTAS IMPORTANTES
+### ============================================================
+### 1. Después de ejecutar 1.2 (Login), copia el token del response
+### 2. Reemplaza {{token}} con: Bearer <token_obtenido>
+### 3. Los IDs en GET/PATCH/DELETE cambiarán según lo que crees
+### 4. Para ejecutar una línea: Ctrl+Alt+R (o clic en "Send Request")
+### 5. Verifica que los datos se guarden en MySQL:
+###    SELECT * FROM reports; 
+###    SELECT * FROM salvitas;
+###    SELECT * FROM users;
+### ============================================================
+### ORDEN RECOMENDADO DE PRUEBAS:
+### ============================================================
+### 1. Ejecuta 1.1 (Registrar usuario)
+### 2. Ejecuta 1.2 (Login) y copia el token
+### 3. Ejecuta 2.1, 2.2 (Listar usuarios)
+### 4. Ejecuta 3.1 (Crear reporte)
+### 5. Ejecuta 3.2, 3.3 (Obtener reportes)
+### 6. Ejecuta 4.1, 4.2 (Crear más reportes para probar geolocalización)
+### 7. Ejecuta 3.6 (Obtener reportes cercanos)
+### 8. Ejecuta 3.7 (Actualizar estado)
+### 9. Ejecuta 2.3 (Eliminar usuario) - Cuidado: se puede eliminar
+### 10. Ejecuta 3.8 (Eliminar reporte)
